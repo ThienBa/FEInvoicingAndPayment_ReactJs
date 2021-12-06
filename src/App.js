@@ -1,24 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+import FormClientInfomation from "./components/FormClientInfomation";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+} from "react-router-dom";
+import FormGenerateInvoice from "./components/FormGenerateInvoice";
+import 'antd/dist/antd.css';
+import Invoice from "./components/Invoice";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch>
+        <Route exact path="/client_infomation" component={FormClientInfomation} />
+        <Route exact path="/generate_invoice" component={FormGenerateInvoice} />
+        <Route exact path="/invoice" component={Invoice} />
+      </Switch>
+    </Router>
   );
 }
 
