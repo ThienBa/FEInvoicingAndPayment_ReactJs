@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
+import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
+import { addUserAction } from '../redux/actions/UserActions';
 
-export default function FormClientInfomation() {
+export default function FormUserInfomation() {
+    const dispatch = useDispatch();
     const [avatarSrc, setAvatarSrc] = useState(null);
 
     const fillInfomationSchema = Yup.object().shape({
@@ -15,6 +18,8 @@ export default function FormClientInfomation() {
             .matches(/(84|0[3|5|7|8|9])+([0-9]{8})+/, 'Invalid phone number')
             .max(10, 'Invalid phone number')
             .required('Phone number is required'),
+        avatar: Yup.string()
+            .required('Avatar is required'),
     });
 
     const formik = useFormik({
@@ -26,7 +31,15 @@ export default function FormClientInfomation() {
         },
         validationSchema: fillInfomationSchema,
         onSubmit: values => {
-            alert(JSON.stringify(values, null, 2));
+            const formData = new FormData();
+            for (const key in values) {
+                if (key !== 'avatar') {
+                    formData.append(key, values[key]);
+                } else {
+                    formData.append('avatar', values[key], values[key].name);
+                }
+            }
+            dispatch(addUserAction(formData));
         },
     });
 
@@ -85,6 +98,7 @@ export default function FormClientInfomation() {
                                         <label className="cursor-pointer ">
                                             <span className="focus:outline-none text-white text-sm py-2 px-4 rounded-full bg-green-400 hover:bg-green-500 hover:shadow-lg">Browse</span>
                                             <input type="file" className="hidden" accept="image/png, image/jpeg, image/jpg,  image/gif" onChange={handleChangeFile} />
+                                            <span className='text-red-500 font-thin italic text-xs ml-3'>{formik.touched.avatar && Boolean(formik.errors.avatar) ? formik.errors.avatar : null}</span>
                                         </label>
                                     </div>
                                 </div>

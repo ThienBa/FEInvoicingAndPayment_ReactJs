@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Select } from 'antd';
 import { useFormik } from 'formik';
+import { useDispatch } from 'react-redux';
+import { displayPopupAction } from '../redux/actions/PopupActions';
 const { Option, OptGroup } = Select;
 
 
 export default function FormGenerateInvoice() {
-    const [numInputItem, setNumInputItem] = useState(1);
+    const dispatch = useDispatch();
 
     const formik = useFormik({
         initialValues: {
@@ -20,24 +22,6 @@ export default function FormGenerateInvoice() {
 
     const handleChange = (value) => {
         console.log(`selected ${value}`);
-    }
-
-    const renderInputItem = () => {
-        let inputItem = [];
-        for (let index = 0; index < numInputItem; index++) {
-            inputItem.push(<tr key={index}>
-                <td>
-                    <input type="text" className="fleading-normal w-full border-b h-10 border-grey-light px-3 rounded-sm relative focus:border-blue hover:shadow-lg" name="itemName" onChange={formik.handleChange} />
-                </td>
-                <td>
-                    <input type="text" className="fleading-normal w-full border-b h-10 border-grey-light px-3 rounded-sm relative focus:border-blue hover:shadow-lg" name="rate" onChange={formik.handleChange} />
-                </td>
-                <td>
-                    <input type="text" className="fleading-normal w-full border-b h-10 border-grey-light px-3 rounded-sm relative focus:border-blue hover:shadow-lg" name="hours" onChange={formik.handleChange} />
-                </td>
-            </tr>);
-        }
-        return inputItem;
     }
 
     return (
@@ -76,11 +60,19 @@ export default function FormGenerateInvoice() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {renderInputItem()}
+                                            <tr>
+                                                <td>
+                                                    <input type="text" className="fleading-normal w-full border-b h-10 border-grey-light px-3 rounded-sm relative focus:border-blue hover:shadow-lg" name="itemName" onChange={formik.handleChange} />
+                                                </td>
+                                                <td>
+                                                    <input type="text" className="fleading-normal w-full border-b h-10 border-grey-light px-3 rounded-sm relative focus:border-blue hover:shadow-lg" name="rate" onChange={formik.handleChange} />
+                                                </td>
+                                                <td>
+                                                    <input type="text" className="fleading-normal w-full border-b h-10 border-grey-light px-3 rounded-sm relative focus:border-blue hover:shadow-lg" name="hours" onChange={formik.handleChange} />
+                                                </td>
+                                            </tr>
                                             <tr className="text-right">
-                                                <td onClick={() => {
-                                                    setNumInputItem(numInputItem + 1);
-                                                }} className="py-3 cursor-pointer text-blue-400 hover:text-blue-500" colSpan={3}>Add item</td>
+                                                <td onClick={() => { dispatch(displayPopupAction()) }} className="py-3 cursor-pointer text-blue-400 hover:text-blue-500" colSpan={3}>Add item</td>
                                             </tr>
                                         </tbody>
                                     </table>
