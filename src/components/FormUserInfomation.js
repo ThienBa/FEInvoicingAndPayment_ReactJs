@@ -3,6 +3,7 @@ import { useFormik } from 'formik';
 import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
 import { addUserAction } from '../redux/actions/UserActions';
+import { Link } from 'react-router-dom';
 
 export default function FormUserInfomation() {
     const dispatch = useDispatch();
@@ -70,7 +71,7 @@ export default function FormUserInfomation() {
                                 <div className="mb-3 space-y-2 w-full text-md">
                                     <label className=" font-semibold text-gray-600 py-2">Fullname</label>
                                     <div className="flex flex-wrap items-stretch w-full mb-4 relative">
-                                        <input type="text" className="flex-shrink flex-grow flex-auto leading-normal w-px flex-1 border h-10 border-grey-light rounded-lg px-3 relative focus:border-blue focus:shadow hover:shadow-lg" placeholder="https://..." name="fullname" onChange={formik.handleChange} />
+                                        <input type="text" className="flex-shrink flex-grow flex-auto leading-normal w-px flex-1 border h-10 border-grey-light rounded-lg px-3 relative focus:border-blue focus:shadow hover:shadow-lg" placeholder="Join..." name="fullname" onChange={formik.handleChange} />
                                     </div>
                                     <span className='text-red-500 font-thin italic text-xs'>{formik.touched.fullname && Boolean(formik.errors.fullname) ? formik.errors.fullname : null}</span>
                                 </div>
@@ -105,6 +106,7 @@ export default function FormUserInfomation() {
                                 <div className="mb-3 space-y-2 w-full text-md text-center">
                                     <button className="w-full bg-green-500 text-white py-3 rounded-md hover:shadow-lg hover:bg-green-600 font-bold" type="submit">Save client</button>
                                 </div>
+                                <Link to="/generate_invoice" className="flex items-center justify-end">Generate invoice<ion-icon name="arrow-redo-outline"></ion-icon></Link>
                             </form>
                         </div>
                     </div>

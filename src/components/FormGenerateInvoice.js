@@ -1,27 +1,57 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Select } from 'antd';
-import { useFormik } from 'formik';
-import { useDispatch } from 'react-redux';
-import { displayPopupAction } from '../redux/actions/PopupActions';
+import { useDispatch, useSelector } from 'react-redux';
+import { displayPopupAction, setUserIdAction } from '../redux/actions/PopupActions';
+import { getAllUserAction, getDetailUserAction } from '../redux/actions/UserActions';
+import { getInvoiceItemByUserIdAction, setDisplayTableItemAction } from '../redux/actions/InvoiceActions';
+import { SweetAlertError } from '../utils/SweetAlert/SweetAlert';
+import { Link } from 'react-router-dom';
 const { Option, OptGroup } = Select;
 
 
-export default function FormGenerateInvoice() {
+export default function FormGenerateInvoice(props) {
     const dispatch = useDispatch();
+    const { userList, userDetail, newUser } = useSelector(state => state.UserReducers);
+    const { invoiceListItem, displayTableItem } = useSelector(state => state.InvoiceReducers);
 
-    const formik = useFormik({
-        initialValues: {
-            itemName: '',
-            rate: '',
-            hours: '',
-        },
-        onSubmit: values => {
-            alert(JSON.stringify(values, null, 2));
-        },
-    });
+    useEffect(() => {
+        dispatch(getAllUserAction());
+        dispatch(getDetailUserAction(newUser.id));
+    }, [])
 
     const handleChange = (value) => {
-        console.log(`selected ${value}`);
+        dispatch(setDisplayTableItemAction());
+        dispatch(getDetailUserAction(value));
+        dispatch(getInvoiceItemByUserIdAction(value));
+    }
+
+    const renderUserSelect = () => {
+        return userList.map((item, index) => {
+            return <Option value={item.id} key={index}>{item.fullname}</Option>
+        })
+    }
+
+    const renderInvoiceListItem = () => {
+        return invoiceListItem.map((item, index) => {
+            return <tr key={index}>
+                <td>
+                    <div className="fleading-normal w-full border-b h-10 border-grey-light px-3 rounded-sm relative focus:border-blue hover:shadow-lg">{item.itemName}</div>
+                </td>
+                <td>
+                    <div className="fleading-normal w-full border-b h-10 border-grey-light px-3 rounded-sm relative focus:border-blue hover:shadow-lg">${item.rate}</div>
+                </td>
+                <td>
+                    <div className="fleading-normal w-full border-b h-10 border-grey-light px-3 rounded-sm relative focus:border-blue hover:shadow-lg">{item.hours}</div>
+                </td>
+            </tr>
+        })
+    }
+
+    const handleTotal = () => {
+        return invoiceListItem.reduce((total, item) => {
+            total += item.rate * item.hours;
+            return total;
+        }, 0);
     }
 
     return (
@@ -35,56 +65,57 @@ export default function FormGenerateInvoice() {
                             <div className="w-full sm:w-auto sm:ml-auto mt-3 sm:mt-0" />
                         </div>
                         <div className="mt-5">
-                            <form onSubmit={formik.handleSubmit} className="form">
+                            <div className="form">
                                 <div className="mb-3 space-y-2 w-full text-md">
                                     <label className="font-semibold text-gray-600 py-2">Client</label>
                                     <div className="flex items-center">
-                                        <div className="w-12 h-12 mr-4 flex-none rounded-xl border overflow-hidden">
-                                            <img className="w-12 h-12 mr-4 object-cover" src="https://images.unsplash.com/photo-1611867967135-0faab97d1530?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1352&q=80" alt="Avatar Upload" />
-                                        </div>
-                                        <Select defaultValue="lucy" bordered={false} className="w-full" onChange={handleChange}>
+                                        {displayTableItem ?
+                                            <div className="w-12 h-12 mr-4 flex-none rounded-xl border overflow-hidden">
+                                                <img className="w-12 h-12 mr-4 object-cover" src={userDetail.avatar} alt="Avatar" />
+                                            </div>
+                                            : ""}
+                                        <Select defaultValue={displayTableItem ? newUser.id : "Choose user"} bordered={false} className="w-full" onChange={handleChange}>
                                             <OptGroup label="Client">
-                                                <Option value="jack">Jack</Option>
-                                                <Option value="lucy">Lucy</Option>
+                                                {renderUserSelect()}
                                             </OptGroup>
                                         </Select>
                                     </div>
                                 </div>
-                                <div className="mb-3 space-y-2 w-full text-md">
-                                    <table className="table-fixed text-left">
+                                <div className={`mb-3 space-y-2 w-full text-md ${displayTableItem ? "" : "hidden"}`}>
+                                    <table className="table-fixed text-center w-full" >
                                         <thead>
-                                            <tr>
+                                            <tr className="mb-3">
                                                 <th className="text-gray-600 font-semibold">Item</th>
                                                 <th className="text-gray-600 font-semibold">Rate</th>
                                                 <th className="text-gray-600 font-semibold">Hours</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>
-                                                    <input type="text" className="fleading-normal w-full border-b h-10 border-grey-light px-3 rounded-sm relative focus:border-blue hover:shadow-lg" name="itemName" onChange={formik.handleChange} />
-                                                </td>
-                                                <td>
-                                                    <input type="text" className="fleading-normal w-full border-b h-10 border-grey-light px-3 rounded-sm relative focus:border-blue hover:shadow-lg" name="rate" onChange={formik.handleChange} />
-                                                </td>
-                                                <td>
-                                                    <input type="text" className="fleading-normal w-full border-b h-10 border-grey-light px-3 rounded-sm relative focus:border-blue hover:shadow-lg" name="hours" onChange={formik.handleChange} />
-                                                </td>
-                                            </tr>
+                                            {renderInvoiceListItem()}
                                             <tr className="text-right">
-                                                <td onClick={() => { dispatch(displayPopupAction()) }} className="py-3 cursor-pointer text-blue-400 hover:text-blue-500" colSpan={3}>Add item</td>
+                                                <td className="py-3 text-blue-400 hover:text-blue-500" colSpan={3}><button onClick={() => {
+                                                    dispatch(displayPopupAction());
+                                                    dispatch(setUserIdAction(userDetail.id));
+                                                }}>Add item</button></td>
                                             </tr>
                                         </tbody>
-                                    </table>
+                                    </table >
                                     <div className="mb-3 space-y-2 w-full text-md flex justify-between">
                                         <label className=" font-semibold text-gray-600 py-2">Total</label>
-                                        <p className="font-bold">99.999vnd</p>
+                                        <p className="font-bold">US${handleTotal().toLocaleString()}.00</p>
                                     </div>
                                     <div className="mb-3 space-y-2 w-full text-md text-center">
-                                        <button className="w-full bg-green-500 text-white py-3 rounded-md hover:shadow-lg hover:bg-green-600 font-bold" type="submit">Done</button>
+                                        <button className="w-full bg-green-500 text-white py-3 rounded-md hover:shadow-lg hover:bg-green-600 font-bold" onClick={() => {
+                                            if (invoiceListItem.length > 0) {
+                                                props.history.push("/invoice");
+                                            } else {
+                                                SweetAlertError("Client has no items to invoice")
+                                            }
+                                        }}>Done</button>
                                     </div>
                                 </div>
-                            </form>
+                                <Link to="/" className="flex items-center"><ion-icon name="arrow-undo-outline"></ion-icon>Go back add client</Link>
+                            </div>
                         </div>
                     </div>
                 </div>
