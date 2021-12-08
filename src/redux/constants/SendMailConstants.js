@@ -1,0 +1,1 @@
+export const SEND_MAIL_API_SAGA = "SEND_MAIL_API_SAGA";

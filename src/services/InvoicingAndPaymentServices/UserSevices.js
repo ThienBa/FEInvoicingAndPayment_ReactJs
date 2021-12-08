@@ -6,15 +6,15 @@ class UserService extends BaseServices {
     }
 
     addUserApi = (newUser) => {
-        return this.post(`/api/v1/users`, newUser);
+        return this.post(`/users`, newUser);
     }
 
     getAllUserApi = () => {
-        return this.get(`/api/v1/users`);
+        return this.get(`/users`);
     }
 
     getDetailUserApi = (user_id) => {
-        return this.get(`/api/v1/users/${user_id}`);
+        return this.get(`/users/${user_id}`);
     }
 }
 

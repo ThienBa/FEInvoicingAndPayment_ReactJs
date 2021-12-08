@@ -17,6 +17,7 @@ export default function FormGenerateInvoice(props) {
     useEffect(() => {
         dispatch(getAllUserAction());
         dispatch(getDetailUserAction(newUser.id));
+        dispatch(getInvoiceItemByUserIdAction(newUser.id));
     }, [])
 
     const handleChange = (value) => {

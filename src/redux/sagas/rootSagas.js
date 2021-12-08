@@ -1,6 +1,7 @@
 import { all } from "@redux-saga/core/effects";
 import * as UserSagas from "./UserSagas";
 import * as InvoiceSagas from "./InvoiceSagas";
+import * as SendMailSagas from "./SendMailSagas";
 
 export function* rootSagas() {
     yield all([
@@ -10,5 +11,7 @@ export function* rootSagas() {
 
         InvoiceSagas.followGetInvoiceItemByUserIdApiSaga(),
         InvoiceSagas.followAddInvoiceItemApiSaga(),
+
+        SendMailSagas.followSendMailApiSaga(),
     ])
 }
